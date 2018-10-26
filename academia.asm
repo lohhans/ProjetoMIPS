@@ -28,6 +28,7 @@
 index:
 
 	la $t0, labelInicial 	#Carrega texto labelInicial
+	la $t3, index		#Grava endereço da label em que esta
 	jal opcao		#Função para mostrar o menu e escolher a opção [ escolha(titulo) ]
 	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
 	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor que 4
@@ -52,12 +53,20 @@ printf:
 ######################################## Vericações #######################################################################
 
 verifica:
-
-	bgt $t1, $a1, dadosInvalidos 	#Verifica a opção do usuário (Campo vazio, clicou cancelar, não foi inteiro)
-	bgt $a0, $t2, dadosInvalidos	#Verifica se a opção escolhida está dentro do número máximo de escolhas possivel (a0 > t2? se sim erro)
-	bgt $t1, $a0 dadosInvalidos	#Verifica se a opção escolida está dentro do número minimo de escolhas possivel (t1 > a0? se sim então erro)
-	sub $t2, $t2, $t2		#Colocando t2 para ter o valor 0 novamente
-	jr $ra				#Caso tudo esteja ok, o programa continua funcionando
+	
+	
+	
+	beq $a1, -1, dadosInvalidos	#Caso dado seja inválido redireciona
+	beq $a1, -2, voltar		#Clicou em cancelar e volta a pagina inicial
+	beq $a1, -3, dadosInvalidos	#Caso dado seja inválido redireciona
+	
+	ble $a0, $t1, dadosInvalidos	#Caso o que recebi($a0) é menor ou igual ao $t1
+	bge $a0, $t2, dadosInvalidos	#Caso o que recebi($a0) é maior ou igual ao $t2
+	
+	addi  $t1, $zero, 0		#Zerar $t1
+	addi  $t2, $zero, 0		#Zerar $t2
+	
+	jr $ra				#Se não houver erro, o programa continua executando
 
 
 dadosInvalidos:
@@ -65,9 +74,14 @@ dadosInvalidos:
 	addi $a1, $zero, 2	#Escolhendo tela de erro
 	la $a0, mensagemDeErro	#Carregando a label que diz o erro
 	addi $t0, $zero, 55	#Escolhendo a tela de mensagens
-	sub $t2, $t2, $t2	#Colocando t2 para ter o valor 0 novamente
+	addi  $t1, $zero, 0	#Zerar $t1
+	addi  $t2, $zero, 0	#Zerar $t2
 	jal printf		#Chamando o print [ printf( error) ]
-	j sair			#Fim do tratamento da exceção
+	jr $t3			#Fim do tratamento da exceção, retorna a tela que estava
+	
+voltar: 
+
+	j sair	#pegar endereço da label e redirecionar
 
 ###########################################################################################################################
 
@@ -81,7 +95,7 @@ redirecionar:
 	beq $a0, 4, opcoesMensalidade	#Menu da menslidade
 
 
-redircionarAluno:
+redirecionarAluno:
 
 	beq $a0, 1, cadastrarAluno	# tela de cadastrar aluno
 	beq $a0, 2, editarAluno		# tela de editar aluno
@@ -89,7 +103,7 @@ redircionarAluno:
 	beq $a0, 4, removerAluno	# tela de remover aluno
 
 
-redircionarFuncionario:
+redirecionarFuncionario:
 
 	beq $a0, 1, cadastrarFuncionario	# tela de cadastrar funcionário
 	beq $a0, 2, editarFuncionario		# tela de editar funcionário
@@ -97,48 +111,59 @@ redircionarFuncionario:
 	beq $a0, 4, removerFuncionario		# tela de remover funcionário
 
 
-redircionarModalidade:
+redirecionarModalidade:
 
 	beq $a0, 1, cadastrarModalidade		# tela de cadastrar Modalidade
 	beq $a0, 2, editarModalidade		# tela de editar Modalidade
 	beq $a0, 3, buscarModalidade		# tela de buscar Modalidade
 	beq $a0, 4, removerModalidade		# tela de remover Modalidade
 
-redircionarMensalidade:
+redirecionarMensalidade: nop
 
-	beq $a0, 1, efetuarPagamento		 # tela de efetuar pagamento de mensalidades
-	beq $a0, 2, mostrarMensalidadesAtrasadas # tela de mostrar mensalidades atrasadas
+	#beq $a0, 1, efetuarPagamento		 # tela de efetuar pagamento de mensalidades
+	#beq $a0, 2, mostrarMensalidadesAtrasadas # tela de mostrar mensalidades atrasadas
 
 #######################################################################################################################
 
 ######################################## Telas referentes a Aluno #####################################################
+
 opcoesAluno:
 
 	la $t0, labelAluno	#Carrega a label do aluno
+	la $t3, opcoesAluno	#Grava endereço da label em que esta
 	jal opcao		#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
 	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
 	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
 	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
-	j index
+	j redirecionarAluno
+	
 
 cadastrarAluno:
 
-	la $t0, labelCadastrarAluno # Carrega a label
+	la $t0, cadastrarAluno	 # Carrega a label
+	la $t3, opcoesAluno	 #Grava endereço da label em que esta
 	jal opcao
+	addi $t1, $t1, 0
+	addi $t2, $zero, 4
+	jal verifica
+	
 
 editarAluno:
 	
 	la $t0, labelEditarAluno # Carrega a label
+	la $t3, editarAluno	 #Grava endereço da label em que esta
 	jal opcao
 	
 buscarAluno:
 
 	la $t0, labelBuscarAluno # Carrega a label
+	la $t3, buscarAluno	 #Grava endereço da label em que esta
 	jal opcao
 
 removerAluno:
 	
 	la $t0, labelRemoverAluno # Carrega a label
+	la $t3, removerAluno	  #Grava endereço da label em que esta
 	jal opcao
 
 #######################################################################################################################
@@ -148,30 +173,35 @@ removerAluno:
 opcoesFuncionario:
 
 	la $t0, labelFuncionario	#Carrega o menu do funcionário
-	jal opcao		#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
-	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
-	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
-	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
+	la $t3, opcoesFuncionario	#Grava endereço da label em que esta
+	jal opcao			#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
+	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
+	addi $t2, $zero, 4		#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
+	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
 	j index
 
 cadastrarFuncionario:
 
 	la $t0, labelCadastrarFuncionario # Carrega a label
+	la $t3, cadastrarFuncionario	  #Grava endereço da label em que esta
 	jal opcao
 
 editarFuncionario:
 
-	la $t0, labelEditarFuncionario # Carrega a label
+	la $t0, labelEditarFuncionario 	# Carrega a label
+	la $t3, editarFuncionario	#Grava endereço da label em que esta
 	jal opcao
 
 buscarFuncionario:
 
-	la $t0, labelBuscarFuncionario # Carrega a label
+	la $t0, labelBuscarFuncionario 	# Carrega a label
+	la $t3, buscarFuncionario	#Grava endereço da label em que esta
 	jal opcao
 
 removerFuncionario:
 
 	la $t0, labelRemoverFuncionario # Carrega a label
+	la $t3, removerFuncionario	#Grava endereço da label em que esta
 	jal opcao
 
 #######################################################################################################################
@@ -181,31 +211,36 @@ removerFuncionario:
 
 opcoesModalidade:
 
-	la $t0, labelModalidade	#Carrega o menu da modalidade
-	jal opcao		#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
-	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
-	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
-	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
+	la $t0, labelModalidade		#Carrega o menu da modalidade
+	la $t3, opcoesModalidade	#Grava endereço da label em que esta
+	jal opcao			#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
+	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
+	addi $t2, $zero, 4		#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
+	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
 	j index
 
 cadastrarModalidade:
 
 	la $t0, labelCadastrarModalidade # Carrega a label
+	la $t3, cadastrarModalidade	 #Grava endereço da label em que esta
 	jal opcao
 
 editarModalidade:
 
-	la $t0, labelEditarModalidade # Carrega a label
+	la $t0, labelEditarModalidade 	# Carrega a label
+	la $t3, editarModalidade	#Grava endereço da label em que esta
 	jal opcao
 	
 buscarModalidade:
 
-	la $t0, labelBuscarModalidade # Carrega a label
+	la $t0, labelBuscarModalidade 	# Carrega a label
+	la $t3, buscarModalidade	#Grava endereço da label em que esta
 	jal opcao
 	
 removerModalidade:
 
-	la $t0, labelRemoverModalidade # Carrega a label
+	la $t0, labelRemoverModalidade 	# Carrega a label
+	la $t3, removerModalidade	#Grava endereço da label em que esta
 	jal opcao
 	
 #######################################################################################################################
@@ -215,11 +250,12 @@ removerModalidade:
 
 opcoesMensalidade:
 
-	la $t0, labelMensalidade#Carrega o menu da mensalidade
-	jal opcao		#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
-	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
-	addi $t2, $zero, 2	#Parâmetro pra saber se a opção escolhida é menor ou igual a 2
-	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 2 [ verificacao(0, 2) ]
+	la $t0, labelMensalidade	#Carrega o menu da mensalidade
+	la $t3, opcoesMensalidade	#Grava endereço da label em que esta
+	jal opcao			#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
+	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
+	addi $t2, $zero, 2		#Parâmetro pra saber se a opção escolhida é menor ou igual a 2
+	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 2 [ verificacao(0, 2) ]
 	j index
 
 sair: nop
