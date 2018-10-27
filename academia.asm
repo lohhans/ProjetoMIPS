@@ -22,6 +22,11 @@
 	labelBuscarModalidade: .asciiz "Buscar modalidade\n"
 	labelRemoverModalidade: .asciiz "Remover modalidade\n"
 	
+	labelNome: .asciiz "Digite o nome abaixo:\n"
+	labelCpf: .asciiz "Digite o CPF corretamente abaixo:\n"
+	labelIdade: .asciiz "Digite a idade abaixo:\n"
+	labelEndereco: .asciiz "Digite o endereço completo abaixo:\n"
+	
 .text
 
 ######################################## Tela inicial #####################################################################
@@ -49,12 +54,22 @@ printf:
 	add $v0, $zero, $t0	#Escolha do tipo de tela do printf
 	syscall			#Chamada da tela
 	jr $ra			#Fim da função
+	
+
+opcaoString:
+	
+	addi $v0, $zero, 54	#syscal que recebe string
+	addi $t5, $zero, 0	# zero t5
+	la $a0, ($t6)		#$t6 tem a label			
+	la $a1, ($t5)		#salvo endereço de t5 em a1
+	addi $a2, $zero, 240	#tamanho da string
+	syscall
+	jr $ra
+	
 
 ######################################## Vericações #######################################################################
 
 verifica:
-	
-	
 	
 	beq $a1, -1, dadosInvalidos	#Caso dado seja inválido redireciona
 	beq $a1, -2, voltar		#Clicou em cancelar e volta a pagina inicial
@@ -84,6 +99,44 @@ voltar:
 	j sair	#pegar endereço da label e redirecionar
 
 ###########################################################################################################################
+
+######################################## Alocar/Desalocar pilha #########################################################
+
+alocar:
+
+	addi $sp, $sp, -960 #espaço alocado 4*240 = 960 
+	jr $ra		#retorna para onde o procedimento foi chamado
+
+desalocar:
+
+	addi $sp, $sp, 240 #espaço desalocado é de 240 
+	jr $ra		#retorna para onde o procedimento foi chamado
+
+######################################## Cadastros #########################################################
+
+efetuarCadastroAluno:
+	
+	jal alocar
+				#PARA NOME
+	la $t6, labelNome	#Guarda o endereço da label em t6
+	jal operacaoString	#Chama a tela de inserir string
+	jal escrever		#Chama a label de salvar em arquivo
+
+				#PARA CPF
+	la $t6, labelCpf	#Guarda o endereço da label em t6
+	jal operacaoString	#Chama a tela de inserir string
+	jal escrever		#Chama a label de salvar em arquivo
+	
+				#PARA IDADE
+	la $t6, labelIdade	#Guarda o endereço da label em t6
+	jal operacaoString	#Chama a tela de inserir string
+	jal escrever		#Chama a label de salvar em arquivo
+
+				#PARA ENDEREÇO
+	la $t6, labelEndereco	#Guarda o endereço da label em t6
+	jal operacaoString	#Chama a tela de inserir string
+	jal escrever		#Chama a label de salvar em arquivo
+
 
 ######################################## Redirecionamento #################################################################
 
@@ -142,7 +195,7 @@ cadastrarAluno:
 
 	la $t0, cadastrarAluno	 # Carrega a label
 	la $t3, opcoesAluno	 #Grava endereço da label em que esta
-	jal opcao
+	jal opcaoString
 	addi $t1, $t1, 0
 	addi $t2, $zero, 4
 	jal verifica
