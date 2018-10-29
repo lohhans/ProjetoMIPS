@@ -27,6 +27,9 @@
 	labelIdade: .asciiz "Digite a idade abaixo:\n"
 	labelEndereco: .asciiz "Digite o endereço completo abaixo:\n"
 	
+	arquivoAluno:   .asciiz "arquivoAluno.txt"
+	buffer: .space 2 # char lido + \0 no final
+	
 .text
 
 ######################################## Tela inicial #####################################################################
@@ -312,3 +315,40 @@ opcoesMensalidade:
 	j index
 
 sair: nop
+
+#######################################################################################################################
+
+######################################## Leitura #############################################################################
+
+     	addi $v0, $zero, 13		# Abrindo o Arquivo                  
+    	la $a0, file                
+    	add $a1, $zero, $zero		# 0 = Leitura 1 = Escrita 9 = Escrita no a partir do ultimo caractere
+    	add $a2, $zero, $zero
+    	syscall				# Em v0 está File Descriptor
+
+    	blt $v0, $zero, End		#Se v0 < 0 indica que houve erro
+    	add $s0, $v0, $zero		# s0 = fileDescriptor  
+##############################################################
+ler:
+    	addi $v0, $zero, 14                 
+    	add $a0, $s0, $zero       # a0 = fileDescriptor
+    	la $a1, buffer             
+    	addi $a2, $zero, 1                  # Tamanho da leitura
+    	syscall
+
+    	blt $v0, $zero, End        # Se v0 < 0 teve erro
+    	beq $v0, $zero, End        # se v0 == 0 achou fim do arquivo
+##############################################################
+   	 # Printar o que foi lido (OPCIONAL)
+    	addi $v0, $zero, 4       # Syscall for Print String
+    	la $a0, buffer
+    	syscall
+
+    	j ler
+##############################################################
+    	# Fechando o arquivo
+    	addi $v0, $zero, 16
+    	la $a0, buffer
+    	syscall
+##############################################################    
+#End: 	nop
