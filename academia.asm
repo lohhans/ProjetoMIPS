@@ -111,13 +111,8 @@ dadosInvalidos:
 
 cadastrarAluno:
 
-	la $a0, file
-	addi $a1, $zero, 9
-	add $a2, $zero, $zero
-	addi $v0, $zero, 13		#Abrir arquivo
-	syscall				#Metodo para abrir arquivo
-	add $s0, $zero, $v0
-	 
+	jal abrirArquivo	#Abre o arquivo
+		 
 				#PARA NOME
 	la $a0, labelNome	#Guarda o endereço da label em t0
 	jal opcaoString		#Chama a tela de inserir string
@@ -141,11 +136,11 @@ cadastrarAluno:
 	add $a0, $zero, $s0
 	jal escrever		#Chama a label de salvar em arquivo
 	
-	add $a0, $zero, $s0
-	addi $v0, $zero, 16
-	syscall
+	jal fecharArquivo
 
-
+	j sair
+	
+	
 ######################################## Redirecionamento #################################################################
 
 redirecionar:
@@ -311,17 +306,37 @@ opcoesMensalidade:
 
 #######################################################################################################################
 
-######################################## Escrita ######################################################################
+######################################## Arquivo ######################################################################
 
+abrirArquivo:
+
+	la $a0, file
+	addi $a1, $zero, 9
+	add $a2, $zero, $zero
+	addi $v0, $zero, 13		#Abrir arquivo
+	syscall				#Metodo para abrir arquivo
+	
+	add $s0, $zero, $v0
+
+	jr $ra
+	
 escrever:
 
 	addi $v0, $zero, 15		#Escrevendo no arquivo
 	la $a1, dadoRecebido		#O que vai ser escrito
 	addi $a2, $zero, 30		#Numero de caracteres a serem escritos
 	syscall				#Metodo para escrever no arquivo
+	
 	jr $ra
 	
+
+fecharArquivo:
 	
+	add $a0, $zero, $s0
+	addi $v0, $zero, 16	#Fechar arquivo
+	syscall
+	
+	jr $ra		
 	
 ####################################### Print inteiro ################################################
 
