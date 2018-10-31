@@ -29,10 +29,16 @@
 	
 	arquivoAluno:   .asciiz "arquivoAluno.txt"
 	buffer: .space 2 # char lido + \0 no final
+
+	file: .asciiz "arquivo_aluno.txt"	#Nome do arquivo que vai ser criado caso não exista
+
+	dadoRecebido: .space 30
+	
 	
 .text
 
 ######################################## Tela inicial #####################################################################
+
 index:
 
 	la $t0, labelInicial 	#Carrega texto labelInicial
@@ -63,10 +69,15 @@ opcaoString:
 	
 	addi $v0, $zero, 54	#syscal que recebe string
 	addi $t5, $zero, 0	# zero t5
-	la $a0, ($t6)		#$t6 tem a label			
-	la $a1, ($t5)		#salvo endereço de t5 em a1
-	addi $a2, $zero, 240	#tamanho da string
+	la $a0, ($t0)		#$t6 tem a label			
+	la $a1, dadoRecebido	#salva o dado recebido na label dadoRecebido
+	addi $a2, $zero, 30	#tamanho da string
 	syscall
+	
+	addi $v0, $zero, 4       
+   	la $a0, dadoRecebido  #print da label
+    	syscall	
+	
 	jr $ra
 	
 
@@ -75,7 +86,7 @@ opcaoString:
 verifica:
 	
 	beq $a1, -1, dadosInvalidos	#Caso dado seja inválido redireciona
-	beq $a1, -2, voltar		#Clicou em cancelar e volta a pagina inicial
+	beq $a1, -2, sair		#Clicou em cancelar e sai do programa
 	beq $a1, -3, dadosInvalidos	#Caso dado seja inválido redireciona
 	
 	ble $a0, $t1, dadosInvalidos	#Caso o que recebi($a0) é menor ou igual ao $t1
@@ -97,47 +108,30 @@ dadosInvalidos:
 	jal printf		#Chamando o print [ printf( error) ]
 	jr $t3			#Fim do tratamento da exceção, retorna a tela que estava
 	
-voltar: 
-
-	j sair	#pegar endereço da label e redirecionar
-
 ###########################################################################################################################
 
-######################################## Alocar/Desalocar pilha #########################################################
 
-alocar:
+######################################## Cadastros ##################################################################
 
-	addi $sp, $sp, -960 #espaço alocado 4*240 = 960 
-	jr $ra		#retorna para onde o procedimento foi chamado
-
-desalocar:
-
-	addi $sp, $sp, 240 #espaço desalocado é de 240 
-	jr $ra		#retorna para onde o procedimento foi chamado
-
-######################################## Cadastros #########################################################
-
-efetuarCadastroAluno:
-	
-	jal alocar
+cadastrarAluno:
 				#PARA NOME
-	la $t6, labelNome	#Guarda o endereço da label em t6
-	jal operacaoString	#Chama a tela de inserir string
+	la $t0, labelNome	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
 	jal escrever		#Chama a label de salvar em arquivo
-
+					
 				#PARA CPF
-	la $t6, labelCpf	#Guarda o endereço da label em t6
-	jal operacaoString	#Chama a tela de inserir string
+	la  $t0, labelCpf	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
 	jal escrever		#Chama a label de salvar em arquivo
 	
 				#PARA IDADE
-	la $t6, labelIdade	#Guarda o endereço da label em t6
-	jal operacaoString	#Chama a tela de inserir string
+	la $t0, labelIdade	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
 	jal escrever		#Chama a label de salvar em arquivo
 
 				#PARA ENDEREÇO
-	la $t6, labelEndereco	#Guarda o endereço da label em t6
-	jal operacaoString	#Chama a tela de inserir string
+	la $t0, labelEndereco	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
 	jal escrever		#Chama a label de salvar em arquivo
 
 
@@ -192,16 +186,6 @@ opcoesAluno:
 	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
 	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
 	j redirecionarAluno
-	
-
-cadastrarAluno:
-
-	la $t0, cadastrarAluno	 # Carrega a label
-	la $t3, opcoesAluno	 #Grava endereço da label em que esta
-	jal opcaoString
-	addi $t1, $t1, 0
-	addi $t2, $zero, 4
-	jal verifica
 	
 
 editarAluno:
@@ -314,10 +298,53 @@ opcoesMensalidade:
 	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 2 [ verificacao(0, 2) ]
 	j index
 
+#######################################################################################################################
+
+######################################## Escrita ######################################################################
+
+escrever:
+
+	addi $v0, $zero, 13		#Abrir arquivo
+	la $a0, file			#Carregando o arquivo
+	addi $a1, $zero, 9		#Flag 1 == modo escrita
+	add $a2, $zero, $zero		#Modo ignorado
+	syscall				#Metodo para abrir arquivo
+			
+	add $t0, $v0, $zero		#Armazenando v0 no registrador t0
+	
+	addi $v0, $zero, 15		#Escrevendo no arquivo
+	add $a0, $t0, $zero		#Carregando o arquivo
+	la $a1, dadoRecebido		#O que vai ser escrito
+	addi $a2, $zero, 30		#Numero de caracteres a serem escritos
+	syscall				#Metodo para escrever no arquivo
+		
+	add $t1, $v0, $zero		#Armazenando v0 no registrador t0
+	
+	addi $v0, $zero, 16		#Fechando arquivo
+	la $a0, file			#Carregando o arquivo
+	syscall				#Metodo para fechar arquivo
+	
+	jr $ra
+	
+	
+####################################### Print inteiro ################################################
+
+int: 
+	
+	addi $v0, $zero, 1       
+   	la $a0, ($t9)  #print o inteiro em t9
+    	syscall	
+	
+	jr $ra
+	
+######################################################################################################################
+
+######################################### Sair #########################################################################
+
 sair: nop
 
 #######################################################################################################################
-
+		
 ######################################## Leitura #############################################################################
 
      	addi $v0, $zero, 13		# Abrindo o Arquivo                  
@@ -326,7 +353,7 @@ sair: nop
     	add $a2, $zero, $zero
     	syscall				# Em v0 está File Descriptor
 
-    	blt $v0, $zero, End		#Se v0 < 0 indica que houve erro
+    	blt $v0, $zero, sair		#Se v0 < 0 indica que houve erro
     	add $s0, $v0, $zero		# s0 = fileDescriptor  
 ##############################################################
 ler:
@@ -336,8 +363,8 @@ ler:
     	addi $a2, $zero, 1                  # Tamanho da leitura
     	syscall
 
-    	blt $v0, $zero, End        # Se v0 < 0 teve erro
-    	beq $v0, $zero, End        # se v0 == 0 achou fim do arquivo
+    	blt $v0, $zero, sair        # Se v0 < 0 teve erro
+    	beq $v0, $zero, sair        # se v0 == 0 achou fim do arquivo
 ##############################################################
    	 # Printar o que foi lido (OPCIONAL)
     	addi $v0, $zero, 4       # Syscall for Print String
@@ -350,5 +377,4 @@ ler:
     	addi $v0, $zero, 16
     	la $a0, buffer
     	syscall
-##############################################################    
-#End: 	nop
+##############################################################  
