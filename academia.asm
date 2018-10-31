@@ -68,16 +68,12 @@ printf:
 opcaoString:
 	
 	addi $v0, $zero, 54	#syscal que recebe string
-	addi $t5, $zero, 0	# zero t5
-	la $a0, ($t0)		#$t6 tem a label			
+	addi $t5, $zero, 0	# zero t5		
 	la $a1, dadoRecebido	#salva o dado recebido na label dadoRecebido
 	addi $a2, $zero, 30	#tamanho da string
+	
 	syscall
-	
-	addi $v0, $zero, 4       
-   	la $a0, dadoRecebido  #print da label
-    	syscall	
-	
+		
 	jr $ra
 	
 
@@ -111,28 +107,43 @@ dadosInvalidos:
 ###########################################################################################################################
 
 
-######################################## Cadastros ##################################################################
+######################################## Cadastros #########################################################
 
 cadastrarAluno:
+
+	la $a0, file
+	addi $a1, $zero, 9
+	add $a2, $zero, $zero
+	addi $v0, $zero, 13		#Abrir arquivo
+	syscall				#Metodo para abrir arquivo
+	add $s0, $zero, $v0
+	 
 				#PARA NOME
-	la $t0, labelNome	#Guarda o endereço da label em t0
+	la $a0, labelNome	#Guarda o endereço da label em t0
 	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
 	jal escrever		#Chama a label de salvar em arquivo
-					
-				#PARA CPF
-	la  $t0, labelCpf	#Guarda o endereço da label em t0
+					#PARA CPF
+	la  $a0, labelCpf	#Guarda o endereço da label em t0
 	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
 	jal escrever		#Chama a label de salvar em arquivo
 	
 				#PARA IDADE
-	la $t0, labelIdade	#Guarda o endereço da label em t0
+	la $a0, labelIdade	#Guarda o endereço da label em t0
 	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
 	jal escrever		#Chama a label de salvar em arquivo
 
 				#PARA ENDEREÇO
-	la $t0, labelEndereco	#Guarda o endereço da label em t0
+	la $a0, labelEndereco	#Guarda o endereço da label em t0
 	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
 	jal escrever		#Chama a label de salvar em arquivo
+	
+	add $a0, $zero, $s0
+	addi $v0, $zero, 16
+	syscall
 
 
 ######################################## Redirecionamento #################################################################
@@ -304,27 +315,12 @@ opcoesMensalidade:
 
 escrever:
 
-	addi $v0, $zero, 13		#Abrir arquivo
-	la $a0, file			#Carregando o arquivo
-	addi $a1, $zero, 9		#Flag 1 == modo escrita
-	add $a2, $zero, $zero		#Modo ignorado
-	syscall				#Metodo para abrir arquivo
-			
-	add $t0, $v0, $zero		#Armazenando v0 no registrador t0
-	
 	addi $v0, $zero, 15		#Escrevendo no arquivo
-	add $a0, $t0, $zero		#Carregando o arquivo
 	la $a1, dadoRecebido		#O que vai ser escrito
 	addi $a2, $zero, 30		#Numero de caracteres a serem escritos
 	syscall				#Metodo para escrever no arquivo
-		
-	add $t1, $v0, $zero		#Armazenando v0 no registrador t0
-	
-	addi $v0, $zero, 16		#Fechando arquivo
-	la $a0, file			#Carregando o arquivo
-	syscall				#Metodo para fechar arquivo
-	
 	jr $ra
+	
 	
 	
 ####################################### Print inteiro ################################################
