@@ -1,10 +1,10 @@
 .data
 
-	labelInicial: .asciiz "Seja bem vindo!\nEscolha uma das opções abaixo:\n1 - Aluno\n2 - Funcionário\n3 - Modalidade\n4 - Mensalidades\n\n"
+	labelInicial: .asciiz "Seja bem vindo!\nEscolha uma das opções abaixo:\n1 - Aluno\n2 - Funcionário\n3 - Modalidade\n4 - Avaliação\n\n"
 	labelAluno: .asciiz "Aluno\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
 	labelFuncionario: .asciiz "Funcionário\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
 	labelModalidade: .asciiz "Modalidade\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
-	labelMensalidade: .asciiz "Mensalidade\nEscolha uma das opções abaixo:\n1 - Efetuar pagamento\n2 - Mostrar mensalidades atrasadas\n\n"
+	labelAvaliacao: .asciiz "Avaliação\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
 	mensagemDeErro: .asciiz "Operação inválida!"
 
 	labelCadastrarAluno: .asciiz "Cadatrar aluno\n"
@@ -22,16 +22,38 @@
 	labelBuscarModalidade: .asciiz "Buscar modalidade\n"
 	labelRemoverModalidade: .asciiz "Remover modalidade\n"
 	
+		
+	labelCadastrarAvaliacao: .asciiz "Cadatrar avaliação\n"
+	labelEditarAvaliacao: .asciiz "Editar avaliação\n"
+	labelBuscarAvaliacao: .asciiz "Buscar avaliação\n"
+	labelRemoverAvaliacao: .asciiz "Remover avaliação\n"
+	
 	labelNome: .asciiz "Digite o nome abaixo:\n"
 	labelCpf: .asciiz "Digite o CPF corretamente abaixo:\n"
 	labelIdade: .asciiz "Digite a idade abaixo:\n"
 	labelEndereco: .asciiz "Digite o endereço completo abaixo:\n"
 	
-	arquivoAluno:   .asciiz "arquivoAluno.txt"
-	buffer: .space 2 # char lido + \0 no final
-
-	file: .asciiz "arquivo_aluno.txt"	#Nome do arquivo que vai ser criado caso não exista
-
+	labelCargoFunc: .asciiz "Dugite o cargo do funcionário abaixo:\n" 
+	
+	labelOrientador: .asciiz "Digite o nome do orientador abaixo:\n"
+	labelTurno: .asciiz "Digite o turno da modalidade:\n"
+	labelValor: .asciiz "Digite o valor referente a modalidade abaixo:\n"
+			
+	arquivoAluno: .asciiz "arquivo_aluno.txt"	
+	arquivoFuncionario: .asciiz "arquivo_funcionario.txt"
+	arquivoModalidade: .asciiz "arquivo_modalidade.txt"
+	arquivoAvaliacao: .asciiz "arquivo_avaliacao.txt"
+	
+	labelNomeAluno: .asciiz "Digite o nome do aluno:\n"
+	labelCircunferenciaAbdominal: .asciiz "Digite a circunferência abdominal do aluno:\n" 
+	labelTorax: .asciiz "Digite a medida do tórax do aluno:\n"
+	labelCintura: .asciiz "Digite a medida da cintura do aluno:\n"
+	labelQuadril: .asciiz "Digite a medida do quadril do aluno:\n"
+	labelBracoDireito: .asciiz "Digite a medida do braço direito do aluno:\n"
+        labelBracoEsquerdo: .asciiz "Digite a medida do braço esquerdo do aluno:\n"
+	labelCoxaDireita: .asciiz "Digite a medida da coxa direita do aluno:\n"
+        labelCoxaEsquerda: .asciiz "Digite a medida da coxa direita do aluno:\n"
+	
 	dadoRecebido: .space 30
 	
 	
@@ -45,7 +67,7 @@ index:
 	la $t3, index		#Grava endereço da label em que esta
 	jal opcao		#Função para mostrar o menu e escolher a opção [ escolha(titulo) ]
 	addi $t1, $t1, 0	#Parâmetro pra saber se a opção escolhido é maior que 0
-	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor que 4
+	addi $t2, $zero, 5	#Parâmetro pra saber se a opção escolhida é menor que 4
 	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
 	j redirecionar
 
@@ -107,40 +129,6 @@ dadosInvalidos:
 ###########################################################################################################################
 
 
-######################################## Cadastros #########################################################
-
-cadastrarAluno:
-
-	jal abrirArquivo	#Abre o arquivo
-		 
-				#PARA NOME
-	la $a0, labelNome	#Guarda o endereço da label em t0
-	jal opcaoString		#Chama a tela de inserir string
-	add $a0, $zero, $s0
-	jal escrever		#Chama a label de salvar em arquivo
-					#PARA CPF
-	la  $a0, labelCpf	#Guarda o endereço da label em t0
-	jal opcaoString		#Chama a tela de inserir string
-	add $a0, $zero, $s0
-	jal escrever		#Chama a label de salvar em arquivo
-	
-				#PARA IDADE
-	la $a0, labelIdade	#Guarda o endereço da label em t0
-	jal opcaoString		#Chama a tela de inserir string
-	add $a0, $zero, $s0
-	jal escrever		#Chama a label de salvar em arquivo
-
-				#PARA ENDEREÇO
-	la $a0, labelEndereco	#Guarda o endereço da label em t0
-	jal opcaoString		#Chama a tela de inserir string
-	add $a0, $zero, $s0
-	jal escrever		#Chama a label de salvar em arquivo
-	
-	jal fecharArquivo
-
-	j sair
-	
-	
 ######################################## Redirecionamento #################################################################
 
 redirecionar:
@@ -148,7 +136,7 @@ redirecionar:
 	beq $a0, 1, opcoesAluno		#Menu do aluno
 	beq $a0, 2, opcoesFuncionario	#Menu do funcionário
 	beq $a0, 3, opcoesModalidade	#Menu da modalidade
-	beq $a0, 4, opcoesMensalidade	#Menu da menslidade
+	beq $a0, 4, opcoesAvaliacao	#Menu da menslidade
 
 
 redirecionarAluno:
@@ -174,10 +162,12 @@ redirecionarModalidade:
 	beq $a0, 3, buscarModalidade		# tela de buscar Modalidade
 	beq $a0, 4, removerModalidade		# tela de remover Modalidade
 
-redirecionarMensalidade: nop
+redirecionarAvaliacao:
 
-	#beq $a0, 1, efetuarPagamento		 # tela de efetuar pagamento de mensalidades
-	#beq $a0, 2, mostrarMensalidadesAtrasadas # tela de mostrar mensalidades atrasadas
+	beq $a0, 1, cadastrarAvaliacao		# tela de cadastrar Avaliacao
+	beq $a0, 2, editarAvaliacao		# tela de editar Avaliacao
+	beq $a0, 3, buscarAvaliacao		# tela de buscar Avaliacao
+	beq $a0, 4, removerAvaliacao		# tela de remover Avaliacao
 
 #######################################################################################################################
 
@@ -192,6 +182,41 @@ opcoesAluno:
 	addi $t2, $zero, 4	#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
 	jal verifica		#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
 	j redirecionarAluno
+	
+
+cadastrarAluno:
+	
+	la $a0, arquivoAluno	#Coloca em a0 o endereço do arquivo
+	jal abrirArquivo	#Abre o arquivo
+		 
+				#PARA NOME
+	la $a0, labelNome	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever		#Chama a label de salvar em arquivo
+				
+				#PARA CPF
+	la  $a0, labelCpf	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever		#Chama a label de salvar em arquivo
+	
+				#PARA IDADE
+	la $a0, labelIdade	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever		#Chama a label de salvar em arquivo
+
+				#PARA ENDEREÇO
+	la $a0, labelEndereco	#Guarda o endereço da label em t0
+	jal opcaoString		#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever		#Chama a label de salvar em arquivo
+	
+	la $a0, arquivoAluno	#Coloca em a0 o endereço do arquivo
+	jal fecharArquivo
+
+	j sair
 	
 
 editarAluno:
@@ -224,13 +249,43 @@ opcoesFuncionario:
 	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
 	addi $t2, $zero, 4		#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
 	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
-	j index
+	j redirecionarFuncionario
+
 
 cadastrarFuncionario:
 
-	la $t0, labelCadastrarFuncionario # Carrega a label
-	la $t3, cadastrarFuncionario	  #Grava endereço da label em que esta
-	jal opcao
+	la $a0, arquivoFuncionario	#Coloca em a0 o endereço do arquivo
+	jal abrirArquivo		#Abre o arquivo
+		 
+					#PARA NOME
+	la $a0, labelNome		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+				
+					#PARA CPF
+	la  $a0, labelCpf		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+	
+					#PARA ENDEREÇO
+	la $a0, labelEndereco		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+								
+					#PARA CARGO
+	la $a0, labelCargoFunc		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+	
+	la $a0, arquivoFuncionario	#Coloca em a0 o endereço do arquivo
+	jal fecharArquivo
+
+	j sair
+	
 
 editarFuncionario:
 
@@ -263,13 +318,45 @@ opcoesModalidade:
 	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
 	addi $t2, $zero, 4		#Parâmetro pra saber se a opção escolhida é menor ou igual a 4
 	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 4 [ verificacao(0, 4) ]
-	j index
+	j redirecionarModalidade
+
 
 cadastrarModalidade:
 
-	la $t0, labelCadastrarModalidade # Carrega a label
-	la $t3, cadastrarModalidade	 #Grava endereço da label em que esta
-	jal opcao
+		
+	la $a0, arquivoModalidade	#Coloca em a0 o endereço do arquivo
+	jal abrirArquivo		#Abre o arquivo
+		 
+					#PARA NOME
+	la $a0, labelNome		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+				
+					#PARA ORIENTADOR
+	la  $a0, labelOrientador	#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+					
+					#PARA TURNO
+	la  $a0, labelTurno		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+	
+					#PARA VALOR
+	la $a0, labelValor		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+	
+	la $a0, arquivoModalidade	#Coloca em a0 o endereço do arquivo
+	jal fecharArquivo
+
+	j sair
+	
+
 
 editarModalidade:
 
@@ -291,18 +378,104 @@ removerModalidade:
 	
 #######################################################################################################################
 
-######################################## Telas referentes a Mensalidade #####################################################
+######################################## Telas referentes a Avaliacao #####################################################
 
 
-opcoesMensalidade:
+opcoesAvaliacao:
 
-	la $t0, labelMensalidade	#Carrega o menu da mensalidade
-	la $t3, opcoesMensalidade	#Grava endereço da label em que esta
+	la $t0, labelAvaliacao	#Carrega o menu da avaliação
+	la $t3, opcoesAvaliacao	#Grava endereço da label em que esta
 	jal opcao			#Função para mostrar o menu e escolher a opções [ escolha(labelAluno) ]
 	addi $t1, $t1, 0		#Parâmetro pra saber se a opção escolhido é maior que 0
 	addi $t2, $zero, 2		#Parâmetro pra saber se a opção escolhida é menor ou igual a 2
 	jal verifica			#Função que verifica se a opção escolhida é um número entre 1 e 2 [ verificacao(0, 2) ]
-	j index
+	j redirecionarAvaliacao
+
+
+cadastrarAvaliacao:
+
+		
+	la $a0, arquivoAvaliacao	#Coloca em a0 o endereço do arquivo
+	jal abrirArquivo		#Abre o arquivo
+		 
+					#PARA NOME
+	la $a0, labelNomeAluno		#Guarda o endereço da label em t0
+	jal opcaoString			#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever			#Chama a label de salvar em arquivo
+				
+						#PARA CIRCUNF ABDOMINAL
+	la  $a0, labelCircunferenciaAbdominal	#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+	
+						#PARA TORAX
+	la  $a0, labelTorax			#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+					
+						#PARA CINTURA
+	la  $a0, labelCintura			#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+	
+						#PARA QUADRIL
+	la  $a0, labelQuadril			#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo	
+
+						#PARA BRAÇO DIREITO	
+	la  $a0, labelBracoDireito		#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+
+						#PARA BRAÇO ESQUERDO	
+	la  $a0, labelBracoEsquerdo		#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+	
+						#PARA COXA COXA DIREITA	
+	la  $a0, labelCoxaDireita		#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+
+						#PARA COXA COXA ESQUERDA	
+	la  $a0, labelCoxaEsquerda		#Guarda o endereço da label em t0
+	jal opcaoString				#Chama a tela de inserir string
+	add $a0, $zero, $s0
+	jal escrever				#Chama a label de salvar em arquivo
+	
+	la $a0, arquivoAvaliacao	#Coloca em a0 o endereço do arquivo
+	jal fecharArquivo
+
+	j sair
+	
+
+editarAvaliacao:
+
+	la $t0, labelEditarAvaliacao 	# Carrega a label
+	la $t3, editarAvaliacao		#Grava endereço da label em que esta
+	jal opcao
+	
+buscarAvaliacao:
+
+	la $t0, labelBuscarAvaliacao 	# Carrega a label
+	la $t3, buscarAvaliacao		#Grava endereço da label em que esta
+	jal opcao
+	
+removerAvaliacao:
+
+	la $t0, labelRemoverAvaliacao 	# Carrega a label
+	la $t3, removerAvaliacao	#Grava endereço da label em que esta
+	jal opcao
+
 
 #######################################################################################################################
 
@@ -310,7 +483,7 @@ opcoesMensalidade:
 
 abrirArquivo:
 
-	la $a0, file
+					#a0 deve ter o endereço da label
 	addi $a1, $zero, 9
 	add $a2, $zero, $zero
 	addi $v0, $zero, 13		#Abrir arquivo
@@ -359,7 +532,7 @@ sair: nop
 ######################################## Leitura #############################################################################
 
      	addi $v0, $zero, 13		# Abrindo o Arquivo                  
-    	la $a0, file                
+    	la $a0, arquivoAluno                
     	add $a1, $zero, $zero		# 0 = Leitura 1 = Escrita 9 = Escrita no a partir do ultimo caractere
     	add $a2, $zero, $zero
     	syscall				# Em v0 está File Descriptor
@@ -367,25 +540,25 @@ sair: nop
     	blt $v0, $zero, sair		#Se v0 < 0 indica que houve erro
     	add $s0, $v0, $zero		# s0 = fileDescriptor  
 ##############################################################
-ler:
-    	addi $v0, $zero, 14                 
-    	add $a0, $s0, $zero       # a0 = fileDescriptor
-    	la $a1, buffer             
-    	addi $a2, $zero, 1                  # Tamanho da leitura
-    	syscall
+#ler: 
+#   	addi $v0, $zero, 14                 
+#  	add $a0, $s0, $zero       # a0 = fileDescriptor
+# 	la $a1, buffer             
+#	addi $a2, $zero, 1                  # Tamanho da leitura
+#	syscall
 
-    	blt $v0, $zero, sair        # Se v0 < 0 teve erro
-    	beq $v0, $zero, sair        # se v0 == 0 achou fim do arquivo
+#    	blt $v0, $zero, sair        # Se v0 < 0 teve erro
+#   	beq $v0, $zero, sair        # se v0 == 0 achou fim do arquivo
 ##############################################################
    	 # Printar o que foi lido (OPCIONAL)
-    	addi $v0, $zero, 4       # Syscall for Print String
-    	la $a0, buffer
-    	syscall
+#    	addi $v0, $zero, 4       # Syscall for Print String
+#    	la $a0, buffer
+#    	syscall
 
-    	j ler
+#    	j ler
 ##############################################################
     	# Fechando o arquivo
-    	addi $v0, $zero, 16
-    	la $a0, buffer
-    	syscall
+#    	addi $v0, $zero, 16
+#    	la $a0, buffer
+#    	syscall
 ##############################################################  
