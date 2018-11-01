@@ -6,6 +6,7 @@
 	labelModalidade: .asciiz "Modalidade\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
 	labelAvaliacao: .asciiz "Avaliação\nEscolha uma das opções abaixo:\n1 - Cadastrar\n2 - Editar\n3 - Buscar\n4 - Remover\n\n"
 	mensagemDeErro: .asciiz "Operação inválida!"
+	mensagemDeSucesso: .asciiz "Operação realizada com sucesso!"
 
 	labelCadastrarAluno: .asciiz "Cadatrar aluno\n"
 	labelEditarAluno: .asciiz "Editar aluno\n"
@@ -97,7 +98,13 @@ opcaoString:
 	syscall
 		
 	jr $ra
-	
+
+operacaoBemSucedida:
+
+	addi $v0, $zero, 55		#Configurando a syscall para lançar tela de escolha
+	la $a0, mensagemDeSucesso	#Carregando o "texto" da tela de escolha
+	syscall				#Syscall da tela
+	j index				#Fim da função
 
 ######################################## Vericações #######################################################################
 
@@ -216,7 +223,7 @@ cadastrarAluno:
 	la $a0, arquivoAluno	#Coloca em a0 o endereço do arquivo
 	jal fecharArquivo
 
-	j sair
+	j operacaoBemSucedida
 	
 
 editarAluno:
@@ -502,6 +509,12 @@ escrever:
 	
 	jr $ra
 	
+#lerArquivo:	addi $a2, $zero, 1			#Quantidade de caracteres que vão ser lidos por vez
+#		addi $v0, $zero, 14			#Seleciona a opção de leitura em arquivo
+#		syscall					#Chama a syscall para guardar no arquivo
+#		
+#		blt $v0, $zero, arquivoNaoEncontrado  	# Se v0 < 0 teve erro
+#		jr $ra					#Volta pro fluxo normal do código
 
 fecharArquivo:
 	
